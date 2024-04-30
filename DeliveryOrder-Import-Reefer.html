@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Order - Export</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            padding: 20px;
+        }
+
+        form {
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Use full width of the container */
+            max-width: 1200px; /* Maximum width */
+            margin: 0 auto; /* Centering the form */
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="date"] {
+            width: calc(50% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #0460FA;
+            border-radius: 5px;
+            box-sizing: border-box;
+            max-width: 300px; /* Limiting form width for better aesthetics */          
+            margin: auto; /* Centering the form on the page */
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus {
+            border-color: #0340c2;
+        }
+
+        button {
+            background-color: #0460FA;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0340c2;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 20px;
+        }
+
+        #tableRows {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f4f4f4; /* Light grey background for visibility */
+            border-radius: 8px;
+        }
+
+        .tableRow {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* Divide the row into 5 equal columns */
+            gap: 10px; /* Space between grid items */
+            align-items: end;
+            margin-bottom: 15px; /* Space between each row */
+        }
+
+        .tableRow label {
+            font-size: 0.8em;
+            color: #666;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+
+        .tableRow input, .tableRow button {
+            width: 100%; /* Full width of grid column */
+            padding: 8px;
+            border: 1px solid #0460FA;
+            border-radius: 4px;
+        }
+
+        .remove-button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .remove-button:hover {
+            background-color: #ff2121;
+        }
+
+        button[type="submit"], button[type="button"] {
+            width: auto;
+            padding: 10px 20px;
+            margin-top: 20px; /* Additional spacing from the last row */
+            grid-column: span 5; /* Span across all columns for full width */
+        }
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 3fr; /* Allocation of space between label and field */
+            gap: 10px; /* Space between label and field */
+            margin-bottom: 15px; /* Space between each form group */
+        }    
+
+        
+        img {
+            margin-left: 150px;
+            float: right;
+            max-width: 150px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+        }
+        .box {
+            width: 350px;
+        }
+        .address {
+            float: right;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            word-wrap: break-word;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        td, tr {
+            overflow: hidden;
+            width: fixed;
+            vertical-align: top;
+            overflow: hidden; /* Hides any content that overflows the cell's box */
+            text-overflow: ellipsis; /* Render ellipses (...) to represent clipped text */
+            white-space: nowrap; /* Prevents text from wrapping */
+            max-width: 20%; /* Sets a maximum width for each cell */
+        }
+        .wrap-text {
+            white-space: normal; /* Allows text to wrap */
+            word-wrap: break-word; /* Ensures words are broken properly */
+        }
+        
+    </style>
+</head>
+<body>
+    <form id="pdfForm">
+        <div class="form-group">
+            Issuing Carrier's Agent Name: <input type="text" name="carrier_agent_name" id="carrier_agent_name" maxlength="50">
+            Issuing Carrier's Agent Address: <input type="text" name="carrier_agent_name" id="carrier_agent_address" maxlength="50">
+            Issuing Carrier's Agent Contact: <input type="text" name="carrier_agent_contact" id="carrier_agent_contact" maxlength="15">
+            Issuing Carrier's Agent Phone: <input type="number" name="carrier_agent_phone" id="carrier_agent_phone" maxlength="15">
+            Issuing Carrier's Agent Fax: <input type="number" name="carrier_agent_fax" id="carrier_agent_fax" maxlength="15">
+        </div>
+        <br><br>
+        <div class="form-group">
+            Date: <input type="date" name="date" id="date" maxlength="10">
+            xpd file #: <input type="text" name="file_number" id="file_number" maxlength="25">
+        </div>
+        <br><br>
+        <div class="form-group">
+            Pickup From: <input type="text" name="puf" id="puf" maxlength="50">
+            Pickup From Address: <input type="text" name="puf" id="puf_address" maxlength="50">
+            Pickup from Contact: <input type="text" name="pickup_contact" id="pickup_contact" maxlength="20">
+            Pickup from Phone: <input type="number" name="pickup_phone" id="pickup_phone" maxlength="15">
+            Pickup from email: <input type="email" name="pickup_email" id="pickup_email" maxlength="20">  
+        </div>
+        <br><br>
+        <div class="form-group">
+            Delivering Carrier: <input type="text" name="delivering_carrier" id="delivering_carrier" maxlength="30">
+            Delivering Carrier Address: <input type="text" name="delivering_carrier" id="delivering_carrier_address" maxlength="30">
+            Deliver To: <input type="text" name="deliver_to" id="deliver_to" maxlength="20">
+        </div>
+        <br><br>
+        <div class="form-group">
+            Shipper Name: <input type="text" name="shipper_address" id="shipper_name" maxlength="50">
+            Shipper Address: <input type="text" name="shipper_address" id="shipper_address" maxlength="50">
+            Shipper Contact: <input type="text" name="shipper_contact" id="shipper_contact" maxlength="15">
+            Shipper Phone: <input type="number" name="shipper_phone" id="shipper_phone" maxlength="15">
+            Shipper Fax: <input type="number" name="shipper_fax" id="shipper_fax" maxlength="15">
+            Shipper Email: <input type="email" name="shipper_email" id="shipper_email" maxlength="20">
+            
+        </div>
+        <br><br>
+        <div class="form-group">
+            Consignee: <input type="text" name="consignee" id="consignee" maxlength="20">
+            Consignee Address: <input type="text" name="consignee" id="consignee_address" maxlength="20">
+            Consignee Email: <input type="email" name="consignee_email" id="consignee_email" maxlength="20">
+        
+        </div>
+        <br><br>
+        <div class="form-group">
+            Bill to Party: <input type="text" name="BTP" id="btp" maxlength="50">
+            Bill to Party Address: <input type="text" name="BTP" id="btp_address" maxlength="50">
+            Bill to Party Contact: <input type="text" name="btp_contact" id="btp_contact" maxlength="20">
+            Bill to Party Phone: <input type="number" name="btp_phone" id="btp_phone" maxlength="20">
+            Bill to Party fax: <input type="number" name="btp_fax" id="btp_fax" maxlength="20">
+            Bill to Party email: <input type="email" name="btp_email" id="btp_email" maxlength="20">
+        </div>
+        <br><br>
+        <div class="form-group">
+            Master Number: <input type="text" name="booking_number" id="master_number" maxlength="20">
+            House Number: <input type="text" name="house_number" id="house_number" maxlength="20">
+            Customer Reference: <input type="text" name="customerRef" id="customerRef" maxlength="20">
+            IT Number: <input type="text" name="TInumber" id="ITnumber" maxlength="50">
+            Entry Number: <input type="text" name="entNum" id="entNum" maxlength="50">
+            Free Time Expeditioon Date: <input type="date" name="FTED" id="FTED" maxlength="10">
+        </div>
+        <br><br>
+        <div class="form-group">
+            Carrier: <input type="text" name="carrier" id="carrier" maxlength="20">
+            Flight/Voyage: <input type="text" name="fly_voy" id="fly_voy" maxlength="20">
+            Arrival Date: <input type="date" name="arrDate" id="arrDate" maxlength="10">
+        </div>
+        <br><br>
+        <div class="form-group">
+            Por of Loading: <input type="text" name="pol" id="pol" maxlength="30">
+            Por of Discharge: <input type="text" name="pod" id="pod" maxlength="30">
+            Final Destination: <input type="text" name="finalDest" id="finalDest" maxlength="20">
+        </div>
+        <br><br>
+        
+        <div id="tableRows">
+            <div class="tableRow">
+                <div>
+                    <label for="marks_and_numbers[]">Marks and Numbers:</label>
+                    <input type="text" name="marks_and_numbers[]" class="marks_and_numbers">
+                </div>
+                <div>
+                    <label for="pieces[]">Pieces:</label>
+                    <input type="number" name="pieces[]" class="pieces">
+                </div>
+                <div>
+                    <label for="description[]">Description:</label>
+                    <input type="text" name="description[]" class="description">
+                </div>
+                <div>
+                    <label for="weight[]">Weight:</label>
+                    <input type="number" name="weight[]" class="weight">
+                </div>
+                <div>
+                    <label for="vol_weight[]">Vol Weight/Chargeable Weight:</label>
+                    <input type="number" name="vol_weight[]" class="vol_weight">
+                </div>
+                <button class="remove-button" type="button" onclick="removeRow(this)">Remove</button>
+            </div>
+        </div>
+        <button type="button" onclick="addRow()">Add Row</button><br><br>
+        <button type="submit">Generate Preview</button>
+    </form>
+<br><br><br>
+
+    <div id="preview"></div>
+    
+    <script>
+        function addRow() {
+            var container = document.getElementById('tableRows');
+            var row = document.createElement('div');
+            row.className = 'tableRow';
+            row.innerHTML = `
+            
+                    <div>
+                        <label for="marks_and_numbers[]">Marks and Numbers:</label>
+                        <input type="text" name="marks_and_numbers[]" class="marks_and_numbers">
+                    </div>
+                    <div>
+                        <label for="pieces[]">Pieces:</label>
+                        <input type="number" name="pieces[]" class="pieces">
+                    </div>
+                    <div>
+                        <label for="description[]">Description:</label>
+                        <input type="text" name="description[]" class="description">
+                    </div>
+                    <div>
+                        <label for="weight[]">Weight:</label>
+                        <input type="number" name="weight[]" class="weight">
+                    </div>
+                    <div>
+                        <label for="vol_weight[]">Vol Weight/Chargeable Weight:</label>
+                        <input type="number" name="vol_weight[]" class="vol_weight">
+                    </div>
+                    <button class="remove-button" type="button" onclick="removeRow(this)">Remove</button>
+                
+            `;
+            container.appendChild(row);
+        }
+
+        function removeRow(button) {
+            var row = button.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
+        
+        document.getElementById('pdfForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting via the browser
+            var carrier_agent_name = document.getElementById('carrier_agent_name').value;
+            var carrier_agent_address = document.getElementById('carrier_agent_address').value;
+            var carrier_agent_contact = document.getElementById('carrier_agent_contact').value;
+            var carrier_agent_phone = document.getElementById('carrier_agent_phone').value;
+            var carrier_agent_fax = document.getElementById('carrier_agent_fax').value;
+            var previewDiv = document.getElementById('preview'); 
+            var date= document.getElementById('date').value;
+            var xpdfile= document.getElementById('file_number').value;
+            var puf= document.getElementById('puf').value;
+            var puf_address= document.getElementById('puf').value;
+            var consignee= document.getElementById('consignee').value;
+            var consignee_address= document.getElementById('consignee_address').value;
+            var pickup_contact= document.getElementById('pickup_contact').value;
+            var pickup_phone= document.getElementById('pickup_phone').value;
+            var pickup_email= document.getElementById('pickup_email').value;
+            var delivering_carrier= document.getElementById('delivering_carrier').value;
+            var delivering_carrier_address= document.getElementById('delivering_carrier_address').value;
+            var deliver_to= document.getElementById('deliver_to').value;
+            var shipper_name= document.getElementById('shipper_name').value;
+            var shipper_address= document.getElementById('shipper_address').value;
+            var shipper_contact= document.getElementById('shipper_contact').value;
+            var shipper_phone= document.getElementById('shipper_phone').value;
+            var shipper_fax= document.getElementById('shipper_fax').value;
+            var shipper_email= document.getElementById('shipper_email').value;
+            var consignee_email= document.getElementById('consignee_email').value;
+            var btp= document.getElementById('btp').value;
+            var btp_address= document.getElementById('btp_address').value;
+            var btp_contact= document.getElementById('btp_contact').value;
+            var btp_fax= document.getElementById('btp_fax').value;
+            var btp_phone= document.getElementById('btp_phone').value;
+            var btp_email= document.getElementById('btp_email').value;
+            var master_number= document.getElementById('master_number').value;
+            var house_number= document.getElementById('house_number').value;
+            var customerRef= document.getElementById('customerRef').value;
+            var carrier= document.getElementById('carrier').value;
+            var fly_voy= document.getElementById('fly_voy').value;
+            var pol= document.getElementById('pol').value;
+            var pod= document.getElementById('pod').value;
+            var finalDest= document.getElementById('finalDest').value;
+            var IT_number= document.getElementById('ITnumber').value;
+            var entNum= document.getElementById('entNum').value;
+            var FTED = document.getElementById('FTED').value;
+            var arrDate= document.getElementById('arrDate').value;
+            var rows = document.getElementsByClassName('tableRow');
+            var tableHTML = '<table style ="border: 2px solid black;text-align: left;"><tr><th style = "background-color: #f0f0f0;">Marks and Numbers</th><th style = "background-color: #f0f0f0;">Pieces</th><th style = "background-color: #f0f0f0;">Description</th><th style = "background-color: #f0f0f0;">Weight</th><th style = "background-color: #f0f0f0;">Vol Wgt/Chrg Wgt</th></tr>';
+
+                
+                var totalSumWeight = 0;
+                var totalSumVolWeight = 0;
+                var totalPieces = 0;
+                var totalWeight = 0;
+                var totalVolWeight = 0;
+            Array.from(rows).forEach(function(row) {
+                var marks = row.querySelector('.marks_and_numbers').value;
+                var pieces = parseFloat(row.querySelector('.pieces').value) || 0;
+                var description = row.querySelector('.description').value;
+                var weight = parseFloat(row.querySelector('.weight').value) || 0;
+                var volWeight = parseFloat(row.querySelector('.vol_weight').value) || 0;
+                
+                totalPieces += pieces;
+                totalSumWeight += weight;
+                totalSumVolWeight += volWeight;
+                totalWeight = totalSumWeight*totalPieces
+                totalVolWeight = totalSumVolWeight*totalPieces
+                
+                tableHTML += `<tr>
+                    <td class="wrap-text" style ="border: 2px solid black;">${marks}</td>
+                    <td class="wrap-text" style ="border: 2px solid black;">${pieces}</td>
+                    <td class="wrap-text" style ="border: 2px solid black;">${description}</td>
+                    <td class="wrap-text" style ="border: 2px solid black;">${weight}</td>
+                    <td class="wrap-text" style ="border: 2px solid black;">${volWeight}</td>
+                </tr>`;
+            });
+            
+            tableHTML += '</table>';
+
+            previewDiv.innerHTML = `
+            <!DOCTYPE html>
+<html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+               
+                <style>
+                    table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    word-wrap: break-word;
+                    border-collapse: collapse;
+                    table-layout: fixed;
+                    }
+                    td, tr {
+                        overflow: hidden;
+                        width: fixed;
+                        vertical-align: top;
+                        overflow: hidden; /* Hides any content that overflows the cell's box */
+                        text-overflow: ellipsis; /* Render ellipses (...) to represent clipped text */
+                        white-space: nowrap; /* Prevents text from wrapping */
+                        max-width: 150px; /* Sets a maximum width for each cell */
+                    }
+                    .wrap-text {
+                        white-space: normal; /* Allows text to wrap */
+                        word-wrap: break-word; /* Ensures words are broken properly */
+                    }
+                    img{
+                        max-width: 200px;
+                    }
+                    .full-width {
+                        width: 100% !important;
+
+                    }
+                    /* Top section with three horizontal divs */
+                    .top {
+                        display: flex;
+                        font-size: 12px;
+                    }
+                    .top > div {
+                        flex: 1; /* Divide space equally among the divs */
+                    }
+                    
+                    .middle, .middle2, .bottom {
+                        margin-top: 10px;
+                        display: flex;
+                    }
+                    .center{
+                        position: relative;
+                        left: 300px;
+                    }
+                    .container {
+                        display: flex;
+                        justify-content: center; /* centers horizontally */
+                        align-items: center; /* centers vertically if you want full centering */
+                        
+                    }
+                    .PDFborder{
+                        border: 2px solid black;
+                        width: 900px;
+                        height: auto;
+                        padding: 20px;
+                        font-family: sans-serif;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+                    .footer{
+                        vertical-align: top;
+                        display: inline-block;
+                        font-size: 13px;
+                        position: relative;
+                        bottom: 10px;
+                        color: gray;
+                    }
+                    .margin{
+                        position: relative;
+                        left: 500px;
+                    }
+                </style>
+            </head>
+            <body>
+            <div class="container">
+                <div class="PDFborder">
+                        <div class="top">
+                            <div class="full-width">
+                                <img style="position: relative;right: 200px;" src="images/xpdLogo.png" alt="XPD Logo">
+                            </div>
+                            <div style="padding-top: 50px;position: relative;right: 200px;" class="full-width">
+                                ${carrier_agent_name}<br>${carrier_agent_address}<br>Contact: ${carrier_agent_contact}<br>Phone: ${carrier_agent_phone}<br>Fax:${carrier_agent_fax}
+                            </div>
+                            <div class=" full-width"><strong style="font-size: 20px; position: relative;left: 150px;top: 20px;"> Delivery Order (DO) - Import - Reefer</strong></div>
+                            <div class="full-width">
+                                <br><br><br><br>
+                                <p>File Number:</p>
+                                <p><strong>${ xpdfile }</strong>
+            </p>                    <p>Date:</p>
+                                <p><strong>${ date }</strong></p>
+                            </div>
+                        </div>
+                        <hr>
+
+                        <table>
+                            <tr>
+                                <td class="wrap-text">
+                                    Pickup from:<br>${puf}<br> ${puf_address}
+                                    <p><strong>Contact:${ pickup_contact }</strong></p>  
+                                    <p><strong>Phone:${pickup_phone}</strong></p>            
+                                    <p><strong>Email:${pickup_email}</strong></p>         
+                                </td>
+                                
+                                <td class="wrap-text">Delivering Carrier:<br> ${delivering_carrier }<br> ${delivering_carrier_address}</td>
+                                <td class="wrap-text">Deliver To: <br>${ deliver_to }</td>
+                                <td class="wrap-text"><p>Bill to Party:${btp} </p>
+                                    <p><strong>Contact:${btp_contact} </strong></p>                  
+                                    <p><strong>Phone:${btp_phone} </strong></p>
+                                    <p><strong>Phone:${btp_fax} </strong></p>                
+                                    <p><strong>Email:${btp_email} </strong></p>
+                                </td>       
+                            </tr>
+                            <tr>
+                                <td class="wrap-text">     
+                                    <p>Shipper (Name and Address):${shipper_name}<br>${shipper_address}</p>
+                                    <p><strong>Contact: ${shipper_contact}</strong></p>                  
+                                    <p><strong>Phone: ${shipper_phone}</strong></p>                
+                                    <p><strong>Fax: ${shipper_fax}</strong></p>              
+                                    <p><strong>Email:${shipper_email} </strong></p>            
+                                </td>
+                                             
+                                
+                                <td></td>
+                                    <td class="wrap-text"> 
+                                        <p>Consignee:<br>${consignee} </p>
+                                        <p>${consignee_address}</p>
+                                        <p><strong>Email:${consignee_email} </strong></p>   
+                                    </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="wrap-text">
+                                    <p>Master Number:<strong><br>${master_number} </strong></p>
+                                    <p>House Number: <strong><br>${house_number}</strong></p>
+                                    <p>Customer Reference:<strong><br>${customerRef} </strong></p>
+                                </td>
+                                <td class="wrap-text">
+                                    <p>IT Number:<strong><br>${IT_number}</strong></p>
+                                    <p>Entry Number:<strong><br>${entNum}</strong></p>
+                                    <p>Free Time Expiration Date:<strong><br>${FTED}</strong></p>
+                                </td>
+                                <td class="wrap-text">
+                                    <p>Carrier:<br><strong>${carrier} </strong></p>
+                                    <p>Flight/Voyage:<br><strong>${fly_voy} </strong></p>
+                                    <p>Arrival Date:<strong><br>${arrDate}</strong></p>
+                                </td>
+                                <td class="wrap-text">
+                                    <p>Port of Loading:<br><strong>${pol} </strong></p>
+                                    <p>Port of Discharge:<strong><br>${pod} </strong></p>
+                                    <p>Final Destination:<strong><br>${finalDest} </strong></p>
+                                    
+                                    
+                                </td>
+                            </tr>
+                        </table>
+
+                        
+                            <table>
+                                <tr>       
+                                    ${tableHTML}
+                                </tr>
+                            </table>
+                            
+                     
+                        <hr>
+                        <div class="bottom full-width">
+                            <div class="full-width">
+                                <strong style="font-size: 20px;">TOTALS:</strong>
+                            </div>
+                            <div class="full-width">
+                                
+                            </div>
+                            <div class="full-width">
+                                
+                            </div>
+                            <div class="totals full-width">
+                                <div>Total Pieces: ${totalPieces}</div>
+                                <div>Total Weight: ${totalWeight}</div>
+                                <div>Total Vol Weight: ${totalVolWeight}</div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div >
+                            <div class="footer">
+                                <p>Special Instructions:</p>     
+                            </div>
+                            <div class="footer margin">
+                                <p>Remarks:</p>     
+                            </div>
+                            <br><br><br>
+                            <div style="font-size: 10px;">
+                                <p><b>It is required that each truck be equiped with DOT Emergency Response Guidebook, and the driver has been instructed in its use.
+                                    This is ti certify that the abive named material are properly calssified, described, packaged, marked, and labeled and are in proper 
+                                    condition for transportation acording to the applicable regulations os the Department os transportation
+                                </b></p>
+                                <p>IMPORTANT!</p>
+                                <p><b>This order is not valid unitl merchandise has been released and is available for delivery. 
+                                    Notify us at once if delivery cannot be delivered as instructed. NOTE: XPD GLOBAL (USA), is an agent only, and has no</b></p>
+                            </div>
+                            <p><strong>THE GOODS HIRREN DESCRIBED ARE ACCEPTED IN APPARENTLY GOOD ORDER AND CONDITION RECEIVED</strong></p>
+                            <hr>
+                            <div>
+                                    <div class="footer">
+                                        <p style="position: relative; top:40px;">Prepared by:</p>     
+                                    </div>
+                                    <div style="text-align: center; position: relative; top:15px; width: 200px;" class="footer">
+                                        <p>Juliana Gil</p>
+                                        <hr style="color: black;"> 
+                                        <p> ${carrier_agent_name}</p>    
+                                    </div>
+                               
+                                
+                                <div style="margin-left: 16px;" class="footer">
+                                    <div>
+                                        <p>CARRIER D.O.</p>
+                                        Received Signature:____________________________
+                                    </div>
+                                    <div>
+                                        <p>CONSIGNEE: Freight</p>
+                                        Received Signature:____________________________
+                                    </div>
+                                </div>
+                                <div style="margin-left: 16px;" class="footer">
+                                    <div style="position: relative; top:30px;">
+                                        <p>Date:____________________________</p>
+                                    </div>
+                                    <div style="position: relative; top:54px;">
+                                        <p>Date:____________________________</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                        </div>
+                            
+                </div>
+            </div>
+            </body>
+            </html>
+                          `;
+        });
+    </script>
+</body>
+</html>
